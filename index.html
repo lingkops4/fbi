@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<style id="webmakerstyle">
+
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 Cyber-Spatial Web</title>
+
+  <!-- 1. 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 2. 引入 GSAP (動畫神器) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <!-- 3. 引入 Vanilla-Tilt (3D卡片效果) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
+  <!-- Google Fonts: Space Grotesk (科技感字體) -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        fontFamily: {
+          sans: ['Space Grotesk', 'sans-serif'],
+          mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        },
+        extend: {
+          colors: {
+            neon: {
+              purple: '#b026ff',
+              cyan: '#00f3ff',
+              bg: '#030014'
+            }
+          },
+          backgroundImage: {
+            'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #030014;
+      cursor: none;
+    }
+
+    /* 隱藏默認鼠標 */
+    /* 自定義滾動條 */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #030014;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f3ff;
+    }
+
+    /* 玻璃擬態增強版 */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 霓虹邊框動畫 */
+    .neon-border::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      z-index: -1;
+      background: linear-gradient(45deg, #b026ff, #00f3ff, #b026ff);
+      filter: blur(10px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .neon-border:hover::before {
+      opacity: 0.7;
+    }
+
+    /* 自定義鼠標樣式 */
+    #cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: difference;
+    }
+
+    #cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 4px;
+      background: #00f3ff;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Glitch 文字效果 */
+    .glitch-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .glitch {
+      position: relative;
+      color: white;
+      mix-blend-mode: lighten;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: #030014;
+    }
+
+    .glitch::before {
+      left: 2px;
+      text-shadow: -1px 0 #ff00c1;
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim 5s infinite linear alternate-reverse;
+    }
+
+    .glitch::after {
+      left: -2px;
+      text-shadow: -1px 0 #00fff9;
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim2 5s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch-anim {
+      0% {
+        clip: rect(12px, 9999px, 51px, 0);
+      }
+
+      5% {
+        clip: rect(72px, 9999px, 86px, 0);
+      }
+
+      10% {
+        clip: rect(3px, 9999px, 15px, 0);
+      }
+
+      100% {
+        clip: rect(1px, 9999px, 1px, 0);
+      }
+    }
+
+    @keyframes glitch-anim2 {
+      0% {
+        clip: rect(66px, 9999px, 81px, 0);
+      }
+
+      5% {
+        clip: rect(12px, 9999px, 96px, 0);
+      }
+
+      10% {
+        clip: rect(32px, 9999px, 6px, 0);
+      }
+
+      100% {
+        clip: rect(1px, 9999px, 1px, 0);
+      }
+    }
+
+    /* 終端機打字機光標 */
+    .cursor-blink {
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body class="overflow-x-hidden text-white selection:bg-neon-cyan selection:text-black">
+
+  <!-- 自定義鼠標 -->
+  <div id="cursor"></div>
+  <div id="cursor-dot"></div>
+
+  <!-- 背景 Canvas -->
+  <canvas id="bg-canvas" class="fixed top-0 left-0 w-full h-full -z-10 opacity-40"></canvas>
+
+  <!-- 導航 -->
+  <nav class="fixed w-full z-50 top-0 border-b border-white/5 bg-black/50 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3 group cursor-pointer">
+        <div class="w-8 h-8 rounded bg-gradient-to-br from-neon-purple to-neon-cyan animate-pulse"></div>
+        <span class="font-bold text-xl tracking-wider group-hover:text-neon-cyan transition-colors">NEXUS<span class="text-xs align-top opacity-50">OS</span></span>
+      </div>
+      <div class="hidden md:flex gap-8 text-sm text-gray-400 font-medium">
+        <a href="#" class="hover:text-white hover:scale-105 transition-all">核心架構</a>
+        <a href="#" class="hover:text-white hover:scale-105 transition-all">神經網絡</a>
+        <a href="#" class="hover:text-white hover:scale-105 transition-all">生態系統</a>
+      </div>
+      <button class="px-6 py-2 rounded-full border border-white/20 hover:bg-white hover:text-black transition-all text-xs font-bold tracking-widest uppercase hover:shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+        Connect
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero 區域 -->
+  <main class="relative pt-40 pb-20 px-6 max-w-7xl mx-auto min-h-screen flex flex-col justify-center">
+    <!-- 裝飾性光暈 -->
+    <div class="absolute top-20 right-0 w-[500px] h-[500px] bg-neon-purple/20 rounded-full blur-[120px] -z-10 mix-blend-screen animate-pulse"></div>
+    <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-neon-cyan/10 rounded-full blur-[100px] -z-10 mix-blend-screen"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <!-- 左側文字 -->
+      <div class="space-y-8 z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neon-cyan/30 bg-neon-cyan/5 text-neon-cyan text-xs font-mono">
+          <span class="w-2 h-2 rounded-full bg-neon-cyan animate-ping"></span>
+          SYSTEM ONLINE // 2026.05.21
+        </div>
+
+        <h1 class="text-6xl md:text-8xl font-bold leading-tight tracking-tighter">
+          <div class="glitch-wrapper mb-2">
+            <span class="glitch" data-text="BEYOND">BEYOND</span>
+          </div>
+          <br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">REALITY</span>
+        </h1>
+
+        <p class="text-gray-400 text-lg max-w-md border-l-2 border-neon-purple pl-4">
+          重構數位邊界。融合空間計算與生成式 AI，為下一代互聯網打造的沉浸式操作系統。
+        </p>
+
+        <div class="flex gap-4 pt-4">
+          <button class="px-8 py-4 bg-white text-black font-bold rounded hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+            啟動介面
+          </button>
+          <button class="px-8 py-4 border border-white/20 rounded hover:border-neon-cyan hover:text-neon-cyan transition-colors">
+            閱讀白皮書
+          </button>
+        </div>
+      </div>
+
+      <!-- 右側：模擬 AI 終端機 -->
+      <div class="relative group" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
+        <!-- 裝飾框 -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-neon-purple to-neon-cyan rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
+
+        <div class="relative bg-black/80 rounded-xl border border-white/10 p-6 font-mono text-xs md:text-sm h-[400px] overflow-hidden shadow-2xl backdrop-blur-md">
+          <div class="flex gap-2 mb-4 border-b border-white/10 pb-4">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="ml-auto text-gray-500">ai_core.tsx — running</span>
+          </div>
+          <!-- 代碼輸出區 -->
+          <div id="terminal-output" class="text-green-400 space-y-2 opacity-90 h-full overflow-y-auto pb-10">
+            <!-- JS 將會填充這裡 -->
+          </div>
+          <!-- 掃描線特效 -->
+          <div class="absolute inset-0 bg-[url('https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bento Grid 功能區 -->
+  <section class="py-24 px-6 relative z-10">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-3xl md:text-5xl font-bold mb-16 text-center">
+        <span class="border-b-4 border-neon-cyan">模組化</span> 架構
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 grid-rows-3 gap-6 h-auto md:h-[800px]">
+
+        <!-- Card 1: 大圖 -->
+        <div class="glass-card neon-border rounded-3xl p-8 md:col-span-2 md:row-span-2 relative overflow-hidden group" data-tilt>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+          <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60" alt="AI Chip">
+          <div class="relative z-20 h-full flex flex-col justify-end">
+            <h3 class="text-3xl font-bold text-white mb-2">神經元處理器</h3>
+            <p class="text-gray-300">本地端 LLM 推理，延遲 < 10ms。</p>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-card neon-border rounded-3xl p-6 md:col-span-1 md:row-span-1 flex flex-col justify-between group hover:bg-white/5 transition-colors" data-tilt>
+          <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-2xl group-hover:rotate-12 transition-transform">⚡</div>
+          <div>
+            <div class="text-4xl font-bold font-mono mb-1 text-neon-cyan">99.9%</div>
+            <div class="text-xs text-gray-400 uppercase tracking-widest">Uptime</div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-card neon-border rounded-3xl p-6 md:col-span-1 md:row-span-2 flex flex-col items-center justify-center text-center group" data-tilt>
+          <div class="w-32 h-32 relative mb-6">
+            <div class="absolute inset-0 rounded-full border-2 border-dashed border-neon-purple animate-[spin_10s_linear_infinite]"></div>
+            <div class="absolute inset-2 rounded-full border-2 border-dotted border-neon-cyan animate-[spin_5s_linear_infinite_reverse]"></div>
+            <div class="absolute inset-0 flex items-center justify-center font-bold text-xl">Core</div>
+          </div>
+          <h3 class="text-xl font-bold">量子加密</h3>
+          <p class="text-sm text-gray-400 mt-2">軍用級別數據保護標準</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="glass-card neon-border rounded-3xl p-8 md:col-span-2 md:row-span-1 flex items-center justify-between relative overflow-hidden" data-tilt>
+          <div class="relative z-10">
+            <h3 class="text-2xl font-bold">空間音訊引擎</h3>
+            <p class="text-gray-400 mt-2">支援 Dolby Atmos 與 360 度音場渲染。</p>
+          </div>
+          <div class="w-24 h-24 bg-gradient-to-r from-neon-purple to-blue-500 rounded-full blur-2xl opacity-50 animate-pulse"></div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="glass-card neon-border rounded-3xl p-6 md:col-span-1 md:row-span-1 flex flex-col justify-center group" data-tilt>
+          <h3 class="text-lg font-bold text-gray-200 group-hover:text-neon-cyan transition-colors">API 接入 -></h3>
+          <p class="text-xs text-gray-500 mt-1">開發者文檔 v2.0</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/5 bg-black py-12 text-center relative overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
+    <p class="text-gray-600 font-mono text-sm">&copy; 2026 NEXUS INDUSTRIES. <span class="animate-pulse text-green-500">●</span> SYSTEM STABLE</p>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // 1. 初始化 Vanilla Tilt (讓卡片動起來)
+    VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+      max: 10,
+      speed: 400,
+      glare: true,
+      "max-glare": 0.3,
+    });
+    // 2. 自定義鼠標跟隨邏輯
+    const cursor = document.getElementById('cursor');
+    const cursorDot = document.getElementById('cursor-dot');
+    document.addEventListener('mousemove', (e) => {
+      // 點是即時的
+      cursorDot.style.left = e.clientX + 'px';
+      cursorDot.style.top = e.clientY + 'px';
+      // 圈圈有一點延遲，製造 fluid 感
+      cursor.animate({
+        left: e.clientX + "px",
+        top: e.clientY + "px"
+      }, {
+        duration: 500,
+        fill: "forwards"
+      });
+    });
+    // 鼠標 Hover 互動效果
+    document.querySelectorAll('a, button, .glass-card').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '50px';
+        cursor.style.height = '50px';
+        cursor.style.background = 'rgba(255, 255, 255, 0.1)';
+        cursor.style.borderColor = 'transparent';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '20px';
+        cursor.style.height = '20px';
+        cursor.style.background = 'transparent';
+        cursor.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+      });
+    });
+    // 3. Canvas 粒子背景特效 (Matrix Grid)
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.size = Math.random() * 1.5;
+        this.color = Math.random() > 0.5 ? '#b026ff' : '#00f3ff';
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+    // 初始化粒子
+    for (let i = 0; i < 100; i++) particles.push(new Particle());
+
+    function animateCanvas() {
+      ctx.clearRect(0, 0, width, height);
+      // 繪製連線
+      particles.forEach((p, index) => {
+        p.update();
+        p.draw();
+        // 簡單的連線邏輯
+        for (let j = index; j < particles.length; j++) {
+          const dx = particles[j].x - p.x;
+          const dy = particles[j].y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(100, 100, 255, ${0.1 - dist/1000})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      });
+      requestAnimationFrame(animateCanvas);
+    }
+    animateCanvas();
+    // 4. 模擬 AI 終端機輸出
+    const terminal = document.getElementById('terminal-output');
+    const lines = [
+      "> Initializing neural interface...",
+      "> Loading modules: [VISUAL, AUDIO, HAPTIC]...",
+      "> Connection established: 12ms latency",
+      "> Syncing with satellite grid...",
+      "> Optimizing render pipeline...",
+      "> ACCESS GRANTED.",
+      "> Welcome, Administrator.",
+      "> Waiting for input<span class='cursor-blink'>_</span>"
+    ];
+    let lineIndex = 0;
+
+    function typeWriter() {
+      if (lineIndex < lines.length) {
+        const p = document.createElement('div');
+        p.innerHTML = lines[lineIndex];
+        terminal.appendChild(p);
+        terminal.scrollTop = terminal.scrollHeight; // 自動滾動到底部
+        lineIndex++;
+        setTimeout(typeWriter, Math.random() * 800 + 200);
+      }
+    }
+    setTimeout(typeWriter, 1000);
+    // 5. GSAP 進場動畫
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.from("nav", {
+      y: -100,
+      opacity: 0,
+      duration: 1,
+      ease: "power4.out"
+    });
+    gsap.from(".glass-card", {
+      scrollTrigger: {
+        trigger: ".glass-card",
+        start: "top 80%"
+      },
+      y: 100,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.1,
+      ease: "power3.out"
+    });
+  </script>
+</body>
+
+</html>
+
+
+</body>
+</html>
